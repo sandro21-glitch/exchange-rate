@@ -1,36 +1,40 @@
-const currencyEl_one = document.getElementById('currency-one');
-const amountEl_one = document.getElementById('amount-one');
-const currencyEl_two = document.getElementById('currency-two');
-const amountEl_two = document.getElementById('amount-two');
-const rateEl = document.getElementById('rate');
-const swap = document.getElementById('swap');
+'use strict';
 
-function calculate() {
-  const currency_one = currencyEl_one.value;
-  const currency_two = currencyEl_two.value;
-  fetch("https://open.exchangerate-api.com/v6/latest")
+
+const currencyOne = document.getElementById('currency-one')
+const currencyTwo = document.getElementById('currency-two')
+const amountOne = document.getElementById('amount-one')
+const amountTwo = document.getElementById('amount-two')
+const rateEl = document.getElementById('rate')
+const swapBtn = document.getElementById('swap')
+
+
+function exchange() {
+    fetch('https://v6.exchangerate-api.com/v6/b35e607e04ed3dfa0ec49c2f/latest/USD')
     .then(res => res.json())
     .then(data => {
-      console.log(data);
-      const rate = data.rates[currency_two] / data.rates[currency_one];
-      rateEl.innerText = `1 ${currency_one} = ${rate} ${currency_two}`;
-      amountEl_two.value = (amountEl_one.value * (rate)).toFixed(2);
-    });
+        // console.log(data)
+        const exchangeRate = data.conversion_rates[currencyTwo.value] / data.conversion_rates[currencyOne.value]
+        rateEl.innerText= `1 ${currencyOne.value} = ${exchangeRate.toFixed(2)} ${currencyTwo.value}`
+        amountTwo.value = (amountOne.value * (exchangeRate)).toFixed(2)
+    })
 }
 
 
-// Event Listener
-currencyEl_one.addEventListener('change', calculate);
-amountEl_one.addEventListener('input', calculate);
-currencyEl_two.addEventListener('change', calculate);
-amountEl_two.addEventListener('input', calculate);
-
-swap.addEventListener('click', () => {
-  const temp = currencyEl_one.value;
-  currencyEl_one.value = currencyEl_two.value;
-  currencyEl_two.value = temp;
-  calculate();
-});
+currencyOne.addEventListener('change', exchange)
+currencyTwo.addEventListener('change', exchange)
+amountOne.addEventListener('input', exchange)
+amountTwo.addEventListener('input', exchange)
 
 
-calculate();
+//Swap
+swapBtn.addEventListener('click', swapExchangeValues)
+
+function swapExchangeValues() {
+    const values = currencyOne.value
+    currencyOne.value = currencyTwo.value
+    currencyTwo.value = values
+    exchange()
+}
+
+exchange()
